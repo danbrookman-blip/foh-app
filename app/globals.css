@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+
+html,
+body {
+  height: 100%;
+  background: #F8FAFC;
+  color: #0B1220;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-feature-settings: "ss01", "cv11";
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl2 shadow-card border border-slate-100;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl2 font-semibold transition active:scale-[0.99];
+    min-height: 52px;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-white px-5 hover:bg-ink/90;
+  }
+  .btn-accent {
+    @apply btn bg-accent text-white px-5 hover:bg-accent/90;
+  }
+  .btn-ghost {
+    @apply btn bg-white text-ink border border-slate-200 px-5 hover:bg-slate-50;
+  }
+  .field {
+    @apply w-full rounded-xl2 border border-slate-200 bg-white px-4 py-4 text-lg outline-none focus:border-ink focus:ring-2 focus:ring-ink/10;
+    min-height: 56px;
+  }
+  .pill {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium;
+  }
+  .pill-ok { @apply pill bg-ok-soft text-ok; }
+  .pill-warn { @apply pill bg-warn-soft text-warn; }
+  .pill-accent { @apply pill bg-accent-soft text-accent; }
+  .pill-mute { @apply pill bg-slate-100 text-ink-muted; }
+}
