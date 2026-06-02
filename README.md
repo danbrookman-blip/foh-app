@@ -1,5 +1,7 @@
 # Airship Lookout
 
+**Live demo:** <https://foh-app.dan-brookman.workers.dev> — deployed on Cloudflare Workers via the OpenNext adapter. Sign in with any manager + venue (Arcado is the one with seeded notes, kindness usage, and insights). See [Known limitations on the deployed URL](#known-limitations-on-the-deployed-url) before sharing widely.
+
 The front-of-house companion to **Airship**. A PWA that GMs, floor managers, and system managers run from their phone. They can look up entitlements without seeing customer PII, send a verification SMS/email, capture notes, and issue Random Acts of Kindness — all without leaving the floor.
 
 Sits alongside **Airship** (vouchers, customer profile, messaging), **Toggle** (gift cards), and reads/writes feedback in an **HGEM**-compatible shape.
@@ -135,6 +137,13 @@ Important finding from the docs: **HGEM's public Results API is read-only.** Kle
 2. **Your own data warehouse, HGEM-shaped schema** (likely the default) — the `FeedbackRecord` type already mirrors HGEM's visit shape (`visitId`, `branchId`, `modificationDate`) so rows join cleanly with whatever Kleene's already pulling from HGEM. Write rows to S3/BigQuery/Snowflake/etc. from the adapter; analysts see one logical "visit feedback" stream with `source` distinguishing first-party (`foh-app`) from HGEM mystery shopper.
 
 Swap point is the same as the others: `lib/hgem/index.ts`.
+
+## Known limitations on the deployed URL
+
+The Cloudflare Workers deployment serves the spine and all seeded content correctly. Two things to know before using it as a working demo across multiple devices:
+
+1. **VAPID env vars need to be set in the Workers environment.** `/api/push/public-key` currently returns an empty key, so Web Push subscription will fail on the deployed URL. Fix: add `VAPID_PUBLIC_KEY` (regular variable) and `VAPID_PRIVATE_KEY` (secret) in the Cloudflare dashboard → Workers & Pages → `foh-app` → Settings → Variables. Values are in the local `.env.local`.
+2. **In-memory state is ephemeral on Workers.** The verification token store, audit log, push subscription store, dynamically-added notes and kindness grants all live in JS module state — fine on a single dev machine, but Workers cold-start between requests and can route different requests to different instances. So: seeded data (lookups, arrivals, insights, the pre-seeded notes and kindness usage) demos beautifully; live state that's written *during* a demo (a verification token, a newly added note, a quota decrement) may not survive to the next request. Cloudflare-native fixes are KV (verification tokens), D1 (audit, notes, kindness), and Durable Objects (push subscriptions). Outside the scope of this prototype; first-class topic for the production build.
 
 ## Production seams (stubbed, ready to swap)
 
