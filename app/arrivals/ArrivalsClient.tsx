@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { ArrivalCard } from "@/components/ArrivalCard";
-import { PushSetup } from "@/components/PushSetup";
 import type { CriterionEvaluation } from "@/lib/arrival-criteria";
 
 type Arrival = {
@@ -72,8 +71,6 @@ export function ArrivalsClient() {
 
   return (
     <div className="space-y-4">
-      <PushSetup />
-
       <details
         className="card p-4"
         open={demoOpen}
@@ -125,7 +122,10 @@ export function ArrivalsClient() {
       ) : (
         <div className="space-y-3">
           {arrivals.map((a) => (
-            <ArrivalCard key={a.customerRef + a.arrivedAt} {...a} />
+            // Key on customerRef alone — arrivedAt is recomputed on every poll,
+            // so including it forces every card to remount every 8s, blowing away
+            // notes/kindness/voice state.
+            <ArrivalCard key={a.customerRef} {...a} />
           ))}
           <p className="text-xs text-ink-subtle text-center mt-4">
             Refreshes every few seconds · No personal data shown beyond first name + initial.

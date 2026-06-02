@@ -17,6 +17,8 @@ type Props = {
   source: string;
   bookingSize?: number | null;
   triggered?: CriterionEvaluation[];
+  /** Strava-style observational snippet — one sentence, narrative. */
+  insight?: string;
 };
 
 /**
@@ -57,6 +59,21 @@ export function ArrivalCard(props: Props) {
           </div>
         </div>
       </div>
+
+      {props.insight ? (
+        <div className="mt-4 rounded-xl2 bg-surface-tint border border-pink-100 px-3 py-2.5 flex gap-2.5 items-start">
+          <span aria-hidden className="text-pink-500 mt-0.5 shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" strokeLinecap="round" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </span>
+          <div className="min-w-0">
+            <div className="section-label text-pink-600">Insight</div>
+            <p className="text-sm text-ink leading-snug mt-0.5">{props.insight}</p>
+          </div>
+        </div>
+      ) : null}
 
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
         <Signal label="Last visit" value={relative(props.lastVisitAt)} />

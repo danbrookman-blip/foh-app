@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSession, DEMO_MANAGERS, DEMO_VENUES } from "@/lib/session";
 import { ManagerShell } from "@/components/ManagerShell";
+import { PushSetup } from "@/components/PushSetup";
 import { LoginForm } from "./_components/LoginForm";
 import { SignOutButton } from "./_components/SignOutButton";
 
@@ -37,6 +38,10 @@ export default async function Home() {
         <Link href="/add-customer" className="btn-ghost w-full">
           Register new customer
         </Link>
+
+        <div className="mt-6">
+          <PushSetup />
+        </div>
 
         <div className="card p-4 mt-6">
           <div className="text-xs uppercase tracking-wide text-ink-subtle mb-1">Signed in as</div>

@@ -41,6 +41,7 @@ export async function GET() {
         source: i % 2 === 0 ? "wifi" : "booking",
         bookingSize,
         triggered,
+        insight: seed.insight,
       };
     }),
   );

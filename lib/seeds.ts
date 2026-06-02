@@ -32,6 +32,15 @@ export type SeedCustomer = {
   lastItemOrdered: string;
   birthMonth: number;
   consentMarketing: boolean;
+  /**
+   * Strava-style observational snippet — a single sentence the floor server can
+   * read in 3 seconds and act on. Warm, specific, slightly clever; distinct from
+   * deterministic signals (recency/frequency) and from manager-authored notes.
+   *
+   * In production this comes from aggregated visit patterns + ML; here it's
+   * mocked per persona for demo richness.
+   */
+  insight: string;
 };
 
 export const SEED_CUSTOMERS: SeedCustomer[] = [
@@ -50,6 +59,8 @@ export const SEED_CUSTOMERS: SeedCustomer[] = [
     lastItemOrdered: "Negroni",
     birthMonth: currentMonth,
     consentMarketing: true,
+    insight:
+      "Negroni first, always. Comes with husband Tom — he goes for the ribeye. Walnut allergy on file, kitchen knows.",
   },
   {
     ref: "c_james",
@@ -66,6 +77,8 @@ export const SEED_CUSTOMERS: SeedCustomer[] = [
     lastItemOrdered: "Sunday roast",
     birthMonth: (currentMonth % 12) + 1,
     consentMarketing: true,
+    insight:
+      "Sunday roast person — 12 in the last year. Last visit was rocky, kitchen delay, comp'd starter. Warm welcome worth it.",
   },
   {
     ref: "c_olivia",
@@ -82,6 +95,8 @@ export const SEED_CUSTOMERS: SeedCustomer[] = [
     lastItemOrdered: "House burger",
     birthMonth: ((currentMonth + 4) % 12) + 1,
     consentMarketing: true,
+    insight:
+      "First visit four days ago. Tried the house burger, told staff it was the best she'd had in Soho. Worth a follow-up.",
   },
   {
     ref: "c_ben",
@@ -98,6 +113,8 @@ export const SEED_CUSTOMERS: SeedCustomer[] = [
     lastItemOrdered: "Guinness",
     birthMonth: ((currentMonth + 7) % 12) + 1,
     consentMarketing: true,
+    insight:
+      "Booth 3 if it's free. Knows the cask rotation inside out — happy to chat about what's on. Two or three pints, never more.",
   },
   {
     ref: "c_priya",
@@ -114,6 +131,8 @@ export const SEED_CUSTOMERS: SeedCustomer[] = [
     lastItemOrdered: "Picpoul de Pinet",
     birthMonth: ((currentMonth + 2) % 12) + 1,
     consentMarketing: false,
+    insight:
+      "Wine list expert — Picpoul is the usual. Enjoys talking through the list; let her pick if she's undecided. Quiet table, please.",
   },
 ];
 

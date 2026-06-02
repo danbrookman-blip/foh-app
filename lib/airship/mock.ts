@@ -173,6 +173,7 @@ export const airshipMock: AirshipAdapter = {
       lastItemOrdered: "—",
       birthMonth: 0,
       consentMarketing: input.consentMarketing,
+      insight: "Just registered — first visit. Make them feel welcome.",
     });
     return { ok: true, customerRef: ref };
   },
