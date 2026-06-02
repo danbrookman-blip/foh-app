@@ -1,8 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#0B1220"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F1543"/>
+      <stop offset="100%" stop-color="#1B2363"/>
+    </linearGradient>
+    <radialGradient id="aura" cx="0.7" cy="0.2" r="0.9">
+      <stop offset="0%" stop-color="#E5277B" stop-opacity="0.45"/>
+      <stop offset="60%" stop-color="#E5277B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="112" fill="url(#aura)"/>
+  <!-- Airship silhouette: stylised elongated balloon -->
   <g fill="#FFFFFF">
-    <circle cx="256" cy="206" r="74"/>
-    <path d="M128 400c0-70 57-126 128-126s128 56 128 126v16H128z"/>
+    <ellipse cx="256" cy="246" rx="156" ry="68"/>
+    <rect x="226" y="316" width="60" height="14" rx="6"/>
+    <rect x="244" y="330" width="24" height="36" rx="6"/>
   </g>
-  <circle cx="384" cy="128" r="38" fill="#E11D48"/>
+  <!-- Pink lookout beacon -->
+  <circle cx="256" cy="246" r="14" fill="#E5277B"/>
 </svg>

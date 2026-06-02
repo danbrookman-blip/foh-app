@@ -8,16 +8,23 @@ import { VoucherCard, GiftCardItem } from "@/components/EntitlementCard";
 
 type Props = {
   customerRef: string;
+  identifierKind: "mobile" | "email";
+  identifierHash: string;
   vouchers: Voucher[];
   giftCards: GiftCard[];
 };
 
 type SelectedKey = `v:${string}` | `g:${string}`;
 
-export function ResultsClient({ customerRef, vouchers, giftCards }: Props) {
+export function ResultsClient({
+  customerRef,
+  identifierKind,
+  identifierHash,
+  vouchers,
+  giftCards,
+}: Props) {
   const router = useRouter();
   const [selected, setSelected] = useState<Set<SelectedKey>>(new Set());
-  const [channel, setChannel] = useState<"sms" | "email">("sms");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,18 +40,24 @@ export function ResultsClient({ customerRef, vouchers, giftCards }: Props) {
     }
     for (const g of giftCards) {
       if (selected.has(`g:${g.id}`)) {
-        out.push({ kind: "giftcard", id: g.id, maskedCode: g.maskedCode, balancePence: g.balancePence });
+        out.push({
+          kind: "giftcard",
+          id: g.id,
+          maskedCode: g.maskedCode,
+          balancePence: g.balancePence,
+        });
       }
     }
     return out;
   }, [selected, vouchers, giftCards]);
 
+  // V1.4: channel is locked by identifier kind. No manager choice surfaced.
+  const channelLabel = identifierKind === "mobile" ? "text" : "email";
+
   return (
     <div className="space-y-5">
-      <div className="card p-4 bg-slate-50 border-slate-200">
-        <div className="text-xs uppercase tracking-wide text-ink-subtle">
-          What the manager sees
-        </div>
+      <div className="card p-4 bg-surface-tint border-pink-100">
+        <div className="section-label">What the manager sees</div>
         <div className="text-sm text-ink-muted mt-1">
           No name, no number, no email. Just what they can redeem on this visit.
         </div>
@@ -52,9 +65,7 @@ export function ResultsClient({ customerRef, vouchers, giftCards }: Props) {
 
       {vouchers.length > 0 ? (
         <section>
-          <h2 className="text-sm font-semibold text-ink-muted mb-2 uppercase tracking-wide">
-            Vouchers · Airship
-          </h2>
+          <h2 className="section-label mb-2">Vouchers · Airship</h2>
           <div className="space-y-3">
             {vouchers.map((v) => (
               <VoucherCard
@@ -74,9 +85,7 @@ export function ResultsClient({ customerRef, vouchers, giftCards }: Props) {
 
       {giftCards.length > 0 ? (
         <section>
-          <h2 className="text-sm font-semibold text-ink-muted mb-2 uppercase tracking-wide">
-            Gift cards · Toggle
-          </h2>
+          <h2 className="section-label mb-2">Gift cards · Toggle</h2>
           <div className="space-y-3">
             {giftCards.map((g) => (
               <GiftCardItem
@@ -93,33 +102,17 @@ export function ResultsClient({ customerRef, vouchers, giftCards }: Props) {
       ) : null}
 
       <section className="card p-4">
-        <div className="text-sm font-semibold mb-2">Send verification by</div>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => setChannel("sms")}
-            className={`btn ${channel === "sms" ? "btn-primary" : "btn-ghost"}`}
-          >
-            Text
-          </button>
-          <button
-            type="button"
-            onClick={() => setChannel("email")}
-            className={`btn ${channel === "email" ? "btn-primary" : "btn-ghost"}`}
-          >
-            Email
-          </button>
-        </div>
-        <p className="text-xs text-ink-muted mt-3">
-          The customer taps the link on their own phone — that's their confirmation that
-          they're here and authorising redemption.
+        <div className="text-sm font-semibold">Verification channel</div>
+        <p className="text-sm text-ink-muted mt-1">
+          We'll {channelLabel} the {identifierKind} they provided. You don't see the
+          address — they tap their own link to authorise the redemption.
         </p>
       </section>
 
       {error ? <div className="text-sm text-accent">{error}</div> : null}
 
       <button
-        className="btn-accent w-full text-lg sticky bottom-24"
+        className="btn-primary w-full text-lg sticky bottom-24"
         disabled={items.length === 0 || submitting}
         onClick={async () => {
           setSubmitting(true);
@@ -127,7 +120,12 @@ export function ResultsClient({ customerRef, vouchers, giftCards }: Props) {
           const res = await fetch("/api/verifications", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ customerRef, channel, items }),
+            body: JSON.stringify({
+              customerRef,
+              identifierKind,
+              identifierHash,
+              items,
+            }),
           });
           const data = await res.json();
           setSubmitting(false);

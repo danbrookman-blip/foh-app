@@ -23,14 +23,26 @@ export function LookupForm() {
         const data = await res.json();
         setSubmitting(false);
         if (!res.ok) {
-          setError(data?.error === "invalid_identifier" ? "That doesn't look like a mobile or email." : "Something went wrong.");
+          setError(
+            data?.error === "invalid_identifier"
+              ? "That doesn't look like a mobile or email."
+              : "Something went wrong.",
+          );
           return;
         }
         if (!data.match) {
+          // Spec F1.3 — wording is "no entitlements found", not "guest not in system".
           router.push(`/lookup/results?status=nomatch&id=${encodeURIComponent(value)}`);
           return;
         }
-        router.push(`/lookup/results?ref=${data.customerRef}`);
+        // Pass identifier kind + hash forward so the verification flow can lock
+        // the channel (V1.4) and bind the token to the lookup (V1.3).
+        const params = new URLSearchParams({
+          ref: data.customerRef,
+          kind: data.identifierKind,
+          hash: data.identifierHash,
+        });
+        router.push(`/lookup/results?${params.toString()}`);
       }}
       className="space-y-4"
     >

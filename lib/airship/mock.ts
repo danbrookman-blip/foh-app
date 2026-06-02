@@ -1,6 +1,7 @@
+import { randomUUID } from "crypto";
 import { findSeedByIdentifier, findSeedByRef, SEED_CUSTOMERS } from "@/lib/seeds";
 import type { AirshipAdapter } from "./adapter";
-import type { CustomerSignals, LookupResult, Voucher } from "./types";
+import type { CustomerNote, CustomerSignals, LookupResult, Voucher } from "./types";
 
 const DAY = 86_400_000;
 const now = Date.now();
@@ -67,6 +68,43 @@ const VOUCHERS: StoredVoucher[] = [
 
 const redeemedIds = new Set<string>();
 const sentMessages: Array<{ customerRef: string; channel: string; body: unknown; at: number }> = [];
+
+const NOTES: CustomerNote[] = [
+  {
+    id: "n_sarah_1",
+    customerRef: "c_sarah",
+    body: "Walnut allergy — kitchen has it on file. Husband (Tom) usually orders the ribeye.",
+    authorName: "Alex Rivers",
+    venueName: "Arcado",
+    createdAt: now - 42 * DAY,
+  },
+  {
+    id: "n_ben_1",
+    customerRef: "c_ben",
+    body: "Prefers booth 3 if free. Knows the cask rotation, happy to chat about it.",
+    authorName: "Sam Patel",
+    venueName: "Arcado",
+    createdAt: now - 14 * DAY,
+  },
+  {
+    id: "n_priya_1",
+    customerRef: "c_priya",
+    body: "Wine list knowledge — let her pick if she's undecided, she enjoys the conversation.",
+    authorName: "Jordan Reed",
+    venueName: "Argento",
+    createdAt: now - 21 * DAY,
+  },
+  {
+    id: "n_james_1",
+    customerRef: "c_james",
+    body: "Last visit had a kitchen delay, comp'd the starter. Worth a warm welcome and quick attention.",
+    authorName: "Alex Rivers",
+    venueName: "Arco",
+    createdAt: now - 78 * DAY,
+  },
+];
+
+const MAX_NOTE_LEN = 500;
 
 function pause(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -152,6 +190,28 @@ export const airshipMock: AirshipAdapter = {
       console.log(`[airship-mock] ${channel} → ${customerRef}: ${body.text}`);
     }
     return { ok: true };
+  },
+
+  async getNotes(customerRef) {
+    return NOTES.filter((n) => n.customerRef === customerRef).sort(
+      (a, b) => b.createdAt - a.createdAt,
+    );
+  },
+
+  async addNote(input) {
+    const body = input.body.trim();
+    if (!body) return { ok: false, reason: "empty" };
+    if (body.length > MAX_NOTE_LEN) return { ok: false, reason: "too_long" };
+    const note: CustomerNote = {
+      id: `n_${randomUUID()}`,
+      customerRef: input.customerRef,
+      body,
+      authorName: input.authorName,
+      venueName: input.venueName,
+      createdAt: Date.now(),
+    };
+    NOTES.unshift(note);
+    return { ok: true, note };
   },
 };
 

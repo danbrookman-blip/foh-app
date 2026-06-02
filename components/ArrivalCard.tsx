@@ -1,6 +1,10 @@
 import { TierPill } from "./TierPill";
+import { NotesPanel } from "./NotesPanel";
+import { KindnessPanel } from "./KindnessPanel";
+import type { CriterionEvaluation } from "@/lib/arrival-criteria";
 
 type Props = {
+  customerRef: string;
   displayName: string;
   tier: "new" | "regular" | "vip" | "at-risk" | "recovery";
   lastVisitAt: number;
@@ -11,16 +15,28 @@ type Props = {
   birthdayThisMonth: boolean;
   arrivedAt: number;
   source: string;
+  bookingSize?: number | null;
+  triggered?: CriterionEvaluation[];
 };
 
 /**
- * Arrival card — the Strava-for-hospitality moment. Five signal slots, no more.
- * Anything beyond five is noise to a manager who's about to walk the floor.
+ * Arrival card. The five signal slots stay deterministic, but the criteria
+ * engine output is overlaid as pills at the top — that's the signal the manager
+ * uses to decide whether to walk over.
  */
 export function ArrivalCard(props: Props) {
   const minsAgo = Math.max(1, Math.round((Date.now() - props.arrivedAt) / 60000));
+  // Drop the duplicates already conveyed by TierPill / birthday flag.
+  const extraTriggered = (props.triggered ?? []).filter(
+    (t) => t.code !== "vip" && t.code !== "birthday_month" && t.code !== "at_risk",
+  );
+  const isPriority = (props.triggered ?? []).some((t) => t.priority >= 80);
+
   return (
-    <div className="card p-4">
+    <div
+      id={props.customerRef}
+      className={`card p-4 ${isPriority ? "ring-2 ring-pink-500/40" : ""}`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -29,9 +45,15 @@ export function ArrivalCard(props: Props) {
             {props.birthdayThisMonth ? (
               <span className="pill-accent">🎂 Birthday month</span>
             ) : null}
+            {extraTriggered.map((t) => (
+              <span key={t.code} className="pill-warn">
+                {t.label}
+              </span>
+            ))}
           </div>
           <div className="text-xs text-ink-subtle mt-0.5">
             Arrived {minsAgo} min ago · {props.source === "wifi" ? "Wi-Fi sign-in" : "Reservation match"}
+            {props.bookingSize ? ` · party of ${props.bookingSize}` : ""}
           </div>
         </div>
       </div>
@@ -42,6 +64,9 @@ export function ArrivalCard(props: Props) {
         <Signal label="Lifetime" value={`${props.lifetimeVisits} visits`} />
         <Signal label="Usually orders" value={props.lastItemOrdered} />
       </dl>
+
+      <KindnessPanel customerRef={props.customerRef} displayName={props.displayName} />
+      <NotesPanel customerRef={props.customerRef} displayName={props.displayName} />
     </div>
   );
 }

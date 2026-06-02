@@ -9,7 +9,7 @@ import { ResultsClient } from "./ResultsClient";
 export default async function ResultsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ref?: string; status?: string; id?: string }>;
+  searchParams: Promise<{ ref?: string; status?: string; id?: string; kind?: string; hash?: string }>;
 }) {
   const session = await getSession();
   if (!session) redirect("/");
@@ -19,13 +19,14 @@ export default async function ResultsPage({
     return (
       <ManagerShell
         manager={{ name: session.managerName, venue: session.venueName }}
-        title="No match"
+        title="No entitlements found"
         back="/lookup"
       >
         <div className="card p-5">
-          <div className="text-lg font-semibold">No customer on file</div>
+          <div className="text-lg font-semibold">No entitlements found</div>
           <p className="text-ink-muted text-sm mt-1">
-            We couldn't find <span className="font-medium text-ink">{sp.id}</span> in Airship or Toggle.
+            Nothing on file for that contact at this venue right now. They may still be
+            a customer — register them to capture for next time.
           </p>
           <div className="mt-5 grid gap-3">
             <Link href="/add-customer" className="btn-accent w-full">
@@ -40,7 +41,10 @@ export default async function ResultsPage({
     );
   }
 
-  if (!sp.ref) redirect("/lookup");
+  if (!sp.ref || !sp.kind || !sp.hash) redirect("/lookup");
+
+  const identifierKind = sp.kind === "email" ? "email" : "mobile";
+  const identifierHash = sp.hash;
 
   const [vouchers, giftCards] = await Promise.all([
     airship.getVouchers(sp.ref),
@@ -51,14 +55,14 @@ export default async function ResultsPage({
     return (
       <ManagerShell
         manager={{ name: session.managerName, venue: session.venueName }}
-        title="Nothing redeemable"
+        title="No entitlements found"
         back="/lookup"
       >
         <div className="card p-5">
-          <div className="text-lg font-semibold">Customer on file — no live entitlements</div>
+          <div className="text-lg font-semibold">No entitlements found</div>
           <p className="text-ink-muted text-sm mt-1">
-            They're a known customer, but there are no vouchers or gift cards available right now.
-            You can still offer a discretionary gesture, or check back after a campaign launches.
+            No vouchers or gift cards available right now. A discretionary gesture
+            (random act of kindness) might be the right call.
           </p>
         </div>
       </ManagerShell>
@@ -71,7 +75,13 @@ export default async function ResultsPage({
       title="What they can redeem"
       back="/lookup"
     >
-      <ResultsClient customerRef={sp.ref} vouchers={vouchers} giftCards={giftCards} />
+      <ResultsClient
+        customerRef={sp.ref}
+        identifierKind={identifierKind}
+        identifierHash={identifierHash}
+        vouchers={vouchers}
+        giftCards={giftCards}
+      />
     </ManagerShell>
   );
 }

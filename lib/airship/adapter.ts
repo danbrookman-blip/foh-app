@@ -1,8 +1,10 @@
 import type {
+  CustomerNote,
   CustomerSignals,
   LookupResult,
   RegisterCustomerInput,
   RegisterCustomerResult,
+  Voucher,
 } from "./types";
 
 /**
@@ -12,8 +14,6 @@ import type {
  * `lib/airship/airship-client.ts` that implements this interface, then change
  * `lib/airship/index.ts` to export that instead of the mock. No UI changes.
  */
-import type { Voucher } from "./types";
-
 export interface AirshipAdapter {
   lookup(identifier: { kind: "mobile" | "email"; value: string }): Promise<LookupResult>;
   /** Fetch the live redeemable vouchers for a customer by their opaque ref. */
@@ -28,4 +28,12 @@ export interface AirshipAdapter {
     channel: "sms" | "email",
     body: { subject?: string; text: string },
   ): Promise<{ ok: boolean }>;
+  /** Newest first. Empty array if none. */
+  getNotes(customerRef: string): Promise<CustomerNote[]>;
+  addNote(input: {
+    customerRef: string;
+    body: string;
+    authorName: string;
+    venueName: string;
+  }): Promise<{ ok: true; note: CustomerNote } | { ok: false; reason: "empty" | "too_long" }>;
 }

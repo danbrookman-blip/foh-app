@@ -14,6 +14,6 @@ export function TierPill({
       return <span className="pill-ok">New</span>;
     case "regular":
     default:
-      return <span className="pill-mute">Regular</span>;
+      return <span className="pill-navy">Regular</span>;
   }
 }

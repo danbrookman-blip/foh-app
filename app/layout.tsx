@@ -2,14 +2,14 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Front of House",
+  title: "Airship Lookout",
   description:
-    "Manager-facing app for looking up customer entitlements without exposing PII. Verifies redemption by text/email.",
+    "Front-of-house companion to Airship. Look up customer entitlements without PII, verify redemption by text or email, capture notes and acts of kindness on the floor.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Front of House",
+    title: "Airship Lookout",
   },
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0B1220",
+  themeColor: "#0F1543",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

@@ -10,6 +10,8 @@ type VerificationView = {
   expiresAt: number;
   confirmedAt?: number;
   venueName: string;
+  channel: "sms" | "email";
+  pinAttemptsRemaining: number;
   items: Array<
     | { kind: "voucher"; id: string; title: string; value: string }
     | { kind: "giftcard"; id: string; maskedCode: string; balancePence: number }
@@ -19,6 +21,10 @@ type VerificationView = {
 export function WaitingClient({ token }: { token: string }) {
   const [v, setV] = useState<VerificationView | null>(null);
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
+  const [pinOpen, setPinOpen] = useState(false);
+  const [pin, setPin] = useState("");
+  const [pinError, setPinError] = useState<string | null>(null);
+  const [pinSubmitting, setPinSubmitting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -92,12 +98,13 @@ export function WaitingClient({ token }: { token: string }) {
     <div className="space-y-4">
       <div className="card p-6 text-center">
         <div className="relative inline-flex h-16 w-16 items-center justify-center mb-3">
-          <span className="absolute inset-0 rounded-full bg-ink/5 animate-ping" />
-          <span className="relative h-3 w-3 rounded-full bg-ink" />
+          <span className="absolute inset-0 rounded-full bg-pink-100 animate-ping" />
+          <span className="relative h-3 w-3 rounded-full bg-pink-500" />
         </div>
         <div className="text-lg font-semibold">Sent — waiting on their tap</div>
         <p className="text-sm text-ink-muted mt-1">
-          Link expires in <span className="font-semibold text-ink">{formatSeconds(secondsLeft)}</span>
+          Sent by {v.channel === "sms" ? "text" : "email"}. Link expires in{" "}
+          <span className="font-semibold text-ink">{formatSeconds(secondsLeft)}</span>
         </p>
       </div>
 
@@ -115,13 +122,74 @@ export function WaitingClient({ token }: { token: string }) {
         </ul>
       </div>
 
-      <details className="card p-4">
-        <summary className="text-sm font-semibold cursor-pointer">Customer not getting the message?</summary>
-        <p className="text-sm text-ink-muted mt-2">
-          Ask them to check their texts/junk folder. If the link expires, start a fresh lookup.
-          Don't redeem anything without their tap — that's the policy.
-        </p>
-      </details>
+      {/* V1.2 — PIN fallback */}
+      <div className="card p-4">
+        <button
+          type="button"
+          className="w-full flex items-center justify-between text-left"
+          onClick={() => setPinOpen((o) => !o)}
+          aria-expanded={pinOpen}
+        >
+          <span className="text-sm font-semibold">Customer can't get the message?</span>
+          <span className="text-ink-subtle text-sm">{pinOpen ? "−" : "+"}</span>
+        </button>
+        {pinOpen ? (
+          <div className="mt-3 space-y-3">
+            <p className="text-xs text-ink-muted">
+              Ask the customer to read out the 6-digit code from their message. Audit
+              flag will mark this redemption as fallback-confirmed for review.
+            </p>
+            <input
+              inputMode="numeric"
+              pattern="[0-9]{6}"
+              maxLength={6}
+              autoComplete="off"
+              className="field text-center text-2xl tracking-[0.4em] font-mono"
+              placeholder="000000"
+              value={pin}
+              onChange={(e) => {
+                setPin(e.target.value.replace(/\D/g, ""));
+                setPinError(null);
+              }}
+            />
+            {pinError ? <div className="text-sm text-accent">{pinError}</div> : null}
+            <button
+              type="button"
+              className="btn-accent w-full"
+              disabled={pin.length !== 6 || pinSubmitting}
+              onClick={async () => {
+                setPinSubmitting(true);
+                setPinError(null);
+                const res = await fetch(`/api/verifications/${token}/confirm-pin`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ pin }),
+                });
+                const data = await res.json().catch(() => ({}));
+                setPinSubmitting(false);
+                if (!res.ok) {
+                  setPinError(
+                    data?.error === "pin_wrong"
+                      ? `Wrong code. Attempts remaining: ${Math.max(0, v.pinAttemptsRemaining - 1)}.`
+                      : data?.error === "rate_limited"
+                      ? "Too many attempts. Start a fresh lookup."
+                      : data?.error === "expired"
+                      ? "Link has expired."
+                      : "Couldn't confirm. Try again.",
+                  );
+                  return;
+                }
+                // Confirmed via PIN — let the poll catch up
+              }}
+            >
+              {pinSubmitting ? "Confirming…" : "Confirm with code"}
+            </button>
+            <p className="text-[11px] text-ink-subtle">
+              Up to {v.pinAttemptsRemaining} attempts before the code locks out.
+            </p>
+          </div>
+        ) : null}
+      </div>
 
       <button
         className="btn-ghost w-full"
@@ -134,7 +202,7 @@ export function WaitingClient({ token }: { token: string }) {
       </button>
 
       <p className="text-xs text-ink-subtle text-center">
-        Demo tip: open <span className="font-mono">/verify/{token}</span> in another tab to simulate the customer's confirmation.
+        Demo tip: open <span className="font-mono">/verify/{token}</span> in another tab to simulate the customer's tap.
       </p>
     </div>
   );

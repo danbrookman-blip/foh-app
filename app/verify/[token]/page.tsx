@@ -30,6 +30,14 @@ export default async function VerifyPage({
         items={v.items}
         expiresAt={v.expiresAt}
       />
+      <footer className="mt-8 pt-4 border-t border-navy-100/60 flex items-center justify-center gap-1.5 text-[11px] text-ink-subtle">
+        <svg width="14" height="14" viewBox="0 0 48 48" fill="none" aria-hidden>
+          <rect width="48" height="48" rx="12" fill="#0F1543" />
+          <ellipse cx="24" cy="22" rx="15" ry="6.5" fill="#FFFFFF" />
+          <circle cx="24" cy="22" r="2" fill="#E5277B" />
+        </svg>
+        <span>Secured by Airship Lookout</span>
+      </footer>
     </div>
   );
 }

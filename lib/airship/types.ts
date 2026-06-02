@@ -54,3 +54,21 @@ export type RegisterCustomerInput = {
 export type RegisterCustomerResult =
   | { ok: true; customerRef: CustomerRef }
   | { ok: false; reason: "duplicate" | "invalid" };
+
+/**
+ * A free-text note a manager attaches to a customer profile.
+ * Visible to all managers at the venue (and possibly brand-wide in production).
+ *
+ * Note: notes can contain sensitive info (allergies, preferences, sometimes opinions).
+ * Production wiring should add: audit log, edit/delete with reason, retention policy,
+ * and a content guard for slurs or PII-bait. Out of scope for prototype.
+ */
+export type CustomerNote = {
+  id: string;
+  customerRef: CustomerRef;
+  body: string;
+  /** Who wrote it — for accountability. */
+  authorName: string;
+  venueName: string;
+  createdAt: number;
+};

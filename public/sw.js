@@ -1,6 +1,6 @@
-// Minimal service worker: shell caching only.
-// Intentionally does not cache API or verify routes — those must be fresh.
-const CACHE = "foh-v1";
+// Airship Lookout — service worker.
+// Handles: PWA shell caching, push events, notification clicks.
+const CACHE = "foh-v2";
 const SHELL = ["/", "/lookup", "/arrivals", "/add-customer", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -32,5 +32,49 @@ self.addEventListener("fetch", (event) => {
         return res;
       })
       .catch(() => caches.match(event.request).then((cached) => cached || caches.match("/"))),
+  );
+});
+
+// Web Push — arrival notifications.
+self.addEventListener("push", (event) => {
+  let data;
+  try {
+    data = event.data ? event.data.json() : null;
+  } catch {
+    data = null;
+  }
+  const title = data?.title ?? "Airship Lookout";
+  const body = data?.body ?? "";
+  const url = data?.url ?? "/arrivals";
+  const tag = data?.tag ?? "lookout-arrival";
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      tag,
+      icon: "/icon.svg",
+      badge: "/icon.svg",
+      data: { url },
+      requireInteraction: false,
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url ?? "/arrivals";
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        for (const client of clientList) {
+          if (client.url.includes(url) && "focus" in client) {
+            return client.focus();
+          }
+        }
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(url);
+        }
+      }),
   );
 });

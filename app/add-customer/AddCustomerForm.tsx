@@ -10,7 +10,8 @@ export function AddCustomerForm() {
     lastName: "",
     mobile: "",
     email: "",
-    consentMarketing: true,
+    // P2.4 — no "deemed consent." Default un-ticked; opt-in must be deliberate.
+    consentMarketing: false,
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,7 +93,7 @@ export function AddCustomerForm() {
         value={form.email}
         onChange={(e) => setForm({ ...form, email: e.target.value })}
       />
-      <label className="flex items-start gap-3 p-3 border border-slate-200 rounded-xl2 bg-white">
+      <label className="flex items-start gap-3 p-3 border border-navy-100 rounded-xl2 bg-white">
         <input
           type="checkbox"
           checked={form.consentMarketing}
@@ -102,10 +103,15 @@ export function AddCustomerForm() {
         <span className="text-sm">
           They're happy to hear from us — offers, events, birthday treats.
           <span className="block text-xs text-ink-muted mt-0.5">
-            Required for Airship marketing campaigns. They can opt out at any time.
+            Tick only if they explicitly opt in. They can opt out at any time.
           </span>
         </span>
       </label>
+      <p className="text-xs text-ink-subtle">
+        <strong>Production note:</strong> consent must be acknowledged on the guest's
+        own device (a one-tap notice sent the same way as a verification message).
+        That second step isn't wired into the prototype yet — see docs/handover-plan.md F2.4.
+      </p>
       {error ? <div className="text-sm text-accent">{error}</div> : null}
       <button className="btn-primary w-full text-lg" disabled={submitting}>
         {submitting ? "Saving…" : "Add to Airship"}

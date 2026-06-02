@@ -9,15 +9,18 @@ export default async function Home() {
   if (!session) {
     return (
       <ManagerShell>
-        <div className="mt-6">
-          <h1 className="text-2xl font-bold leading-tight">Front of House</h1>
-          <p className="text-ink-muted mt-2 text-base">
-            Look up customer entitlements, send a verification, redeem at the till.
-            No customer data on screen.
+        <div className="relative overflow-hidden rounded-xl2 mt-6 p-6 bg-airship-aura border border-navy-100/60">
+          <div className="section-label">Front of house, on Airship</div>
+          <h1 className="mt-1 text-[28px] font-bold leading-[1.1] tracking-tightish text-navy-900">
+            Eyes on the floor, hands off the data.
+          </h1>
+          <p className="text-ink-muted mt-2 text-[15px]">
+            Look up entitlements, send a verification, redeem at the till. Notes and
+            random acts of kindness, right where the customer is standing.
           </p>
-          <div className="mt-8">
-            <LoginForm managers={DEMO_MANAGERS} venues={DEMO_VENUES} />
-          </div>
+        </div>
+        <div className="mt-6">
+          <LoginForm managers={DEMO_MANAGERS} venues={DEMO_VENUES} />
         </div>
       </ManagerShell>
     );

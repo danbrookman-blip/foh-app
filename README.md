@@ -1,6 +1,8 @@
-# Front of House
+# Airship Lookout
 
-A manager-facing PWA that sits in front of **Airship** (vouchers, customer profile) and **Toggle** (gift cards). Built so floor managers, GMs and system managers can look up what a customer can redeem — without exposing PII — and authorise the redemption with a customer-side text/email tap.
+The front-of-house companion to **Airship**. A PWA that GMs, floor managers, and system managers run from their phone. They can look up entitlements without seeing customer PII, send a verification SMS/email, capture notes, and issue Random Acts of Kindness — all without leaving the floor.
+
+Sits alongside **Airship** (vouchers, customer profile, messaging), **Toggle** (gift cards), and reads/writes feedback in an **HGEM**-compatible shape.
 
 ## Why this exists
 
@@ -8,9 +10,13 @@ There is no Ops-level access at the venue today. Floor staff can't help a custom
 
 This app fixes that with one mechanic: **the customer's tap on the verification link is both the proof they're physically present *and* the authorisation to redeem.** Manager never sees the customer's data, customer never has to dig through email at the bar.
 
+## The product spec lives in [docs/handover-plan.md](docs/handover-plan.md)
+
+That document is the source of truth for what to build and how it must behave. This codebase is a **partial proof** of that spec — the spine works end-to-end, several requirements are stubbed structurally, and some are deliberately missing. The "Spec gaps still open" section below names what's missing so a reviewer or the next engineer can see at a glance.
+
 ## Run it
 
-**Prerequisites:** Node 20+ — install from <https://nodejs.org> (LTS). This machine doesn't have Node installed yet, so the dev server hasn't been smoke-tested end-to-end; once Node's in, the install + run should work cleanly.
+**Prerequisites:** Node 20+ (LTS).
 
 ```powershell
 cd C:\Users\Airsh\Github\foh-app
@@ -129,6 +135,39 @@ Important finding from the docs: **HGEM's public Results API is read-only.** Kle
 2. **Your own data warehouse, HGEM-shaped schema** (likely the default) — the `FeedbackRecord` type already mirrors HGEM's visit shape (`visitId`, `branchId`, `modificationDate`) so rows join cleanly with whatever Kleene's already pulling from HGEM. Write rows to S3/BigQuery/Snowflake/etc. from the adapter; analysts see one logical "visit feedback" stream with `source` distinguishing first-party (`foh-app`) from HGEM mystery shopper.
 
 Swap point is the same as the others: `lib/hgem/index.ts`.
+
+## Production seams (stubbed, ready to swap)
+
+These structural pieces exist as adapter interfaces with in-memory mocks. Each maps to a specific requirement in [docs/handover-plan.md](docs/handover-plan.md). Production wiring replaces the mock exports in `lib/<module>/index.ts` without touching the UI.
+
+| Seam | What it does | Spec | Swap point |
+| --- | --- | --- | --- |
+| `lib/audit/` | Append-only, hash-chained audit log + HMAC identifier hashing. Every manager write hits it (lookup, verification send/confirm, register, kindness grant, note add). | L1.1–L1.5, P1.4, P1.8 | `lib/audit/index.ts` exports `auditMock`; swap to immutable store (S3 Object Lock, QLDB) |
+| `lib/verification/store.ts` | HMAC-signed token bound to (identifierHash, venueId, entitlementIds, sessionId), 5-min expiry, 6-digit PIN fallback with attempt rate-limit. | V1.1–V1.5 | Replace in-memory `Map` with Redis-with-TTL; keep the signing + binding logic |
+| `lib/tenant-config/` | Per-operator config: signal toggles, verification expiry override, opt-out registry. | F3.4, P3.3, C1 | Replace mock with the operator-config service brand admins write to |
+| `lib/airship/`, `lib/toggle/`, `lib/hgem/`, `lib/kindness/` | Vendor adapters. UI imports only from the index files. | F1.2, F1.4, F2.5 | Implement the interface in a real client file and re-export |
+
+The audit log's hash-chain integrity can be verified at any time via `audit.verifyChain(operatorId)` — production audit + DSAR endpoints sit on top of that.
+
+## Spec gaps still open
+
+The prototype does not yet implement these requirements from the handover plan. Each is small-to-medium work, called out so the next engineer doesn't have to rediscover them:
+
+- **A1.1–A1.5** — auth is a cookie stub. No 2FA, no device pairing, no shift-end re-auth, no head-office force-logout. The session type has the right fields (`operatorId`, `staffId`, `sessionId`); the surfacing of those is what's missing.
+- **F1.6** — manager doesn't currently "log redemption complete" as a separate action. The confirmation event is logged but a manual confirm-on-till step isn't surfaced.
+- **F2.4** — guest's second-device consent acknowledgement for new-guest capture. The `AddCustomerForm` writes through directly today; production needs a verify-style link to the guest's own device. Add-customer route includes a TODO comment.
+- **G1.4** — multiple-match disambiguation on lookup is not handled.
+- **P1.5** — DSAR export endpoint not wired. The audit log has `query()` keyed on `identifierHash`; the public surface that lets a customer pull their own history is what's needed.
+- **F3.4** — tenant-config exists; the arrivals signal layer doesn't yet honour the per-signal toggles. One-line change in `app/api/arrivals/route.ts`.
+- **P3.3** — customer signal-layer opt-out flow not surfaced (opt-out registry exists in tenant-config).
+- **X1.1** — full WCAG 2.1 AA audit not run.
+
+## Two prototype features not in the spec
+
+- **Notes on profiles** (`components/NotesPanel.tsx`). Manager-attached free-text notes with **voice dictation** (Web Speech API — tap the mic, speak, the transcript appears live in the textarea). Useful for floor service but crosses the "what does the manager see" line the spec is careful with. Treat as a Phase 3+ candidate or remove.
+
+  **Voice transcription notes for production:** Chrome's Web Speech API routes audio to Google's servers — that has data-processing implications worth flagging to the DPO (P1.7 cross-border data flow). Safari uses Apple's on-device or server recognition depending on version. For a regulated production deployment, the recommended path is server-side Whisper (or a UK-hosted ASR equivalent): capture audio with `MediaRecorder`, POST the blob to `/api/transcribe`, server transcribes. Same UI shape; swap inside `components/useVoiceDictation.ts`. The Web Speech approach also won't cope well with noisy venues — second reason to consider Whisper.
+- **Random Acts of Kindness** (`lib/kindness/`). Manager-issued comps with monthly quotas. Bypasses the verification mechanic (manager hands it over without customer confirmation), which makes it harder to defend regulatorily. Either belongs as its own use case or needs to inherit the verification primitive.
 
 ## Roadmap notes (post-demo)
 
