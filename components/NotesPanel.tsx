@@ -99,7 +99,7 @@ export function NotesPanel({
                   placeholder={
                     voice.listening
                       ? "Listening… speak in plain English, GB."
-                      : `Type or hit the mic. Anything worth knowing about ${displayName.split(" ")[0]} next time — preferences, allergies, how they like their drink.`
+                      : `Type or hit the mic. Anything worth knowing about ${displayName.split(" ")[0]} next time — preferences, seating, how they like their drink. (Dietary or allergen info belongs in the kitchen system, not here.)`
                   }
                   value={draft + (voice.interim ? (draft && !draft.endsWith(" ") ? " " : "") + voice.interim : "")}
                   maxLength={MAX}

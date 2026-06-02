@@ -60,7 +60,7 @@ export const SEED_CUSTOMERS: SeedCustomer[] = [
     birthMonth: currentMonth,
     consentMarketing: true,
     insight:
-      "Negroni first, always. Comes with husband Tom — he goes for the ribeye. Walnut allergy on file, kitchen knows.",
+      "Negroni first, always. Comes with husband Tom — he goes for the ribeye, medium-rare. Likes a quiet table away from the bar.",
   },
   {
     ref: "c_james",

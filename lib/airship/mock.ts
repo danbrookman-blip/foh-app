@@ -73,7 +73,7 @@ const NOTES: CustomerNote[] = [
   {
     id: "n_sarah_1",
     customerRef: "c_sarah",
-    body: "Walnut allergy — kitchen has it on file. Husband (Tom) usually orders the ribeye.",
+    body: "Prefers a corner table if one's free. Husband (Tom) usually orders the ribeye, medium-rare.",
     authorName: "Alex Rivers",
     venueName: "Arcado",
     createdAt: now - 42 * DAY,
