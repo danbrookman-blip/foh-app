@@ -13,7 +13,7 @@ export default async function Home() {
         <div className="relative overflow-hidden rounded-xl2 mt-6 p-6 bg-airship-aura border border-navy-100/60">
           <div className="section-label">Front of house, on Airship</div>
           <h1 className="mt-1 text-[28px] font-bold leading-[1.1] tracking-tightish text-navy-900">
-            Eyes on the floor, hands off the data.
+            Your personal customer assistant.
           </h1>
           <p className="text-ink-muted mt-2 text-[15px]">
             Look up entitlements, send a verification, redeem at the till. Notes and
