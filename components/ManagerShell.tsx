@@ -56,7 +56,7 @@ function BottomNav({ pathname }: { pathname: string | null }) {
     { href: "/lookup", label: "Lookup", icon: LookupIcon },
     { href: "/arrivals", label: "Arrivals", icon: ArrivalsIcon },
     { href: "/add-customer", label: "Add", icon: AddIcon },
-    { href: "/", label: "Settings", icon: SettingsIcon },
+    { href: "/", label: "Profile", icon: ProfileIcon },
   ];
   return (
     <nav
@@ -74,7 +74,7 @@ function BottomNav({ pathname }: { pathname: string | null }) {
               key={t.href}
               href={t.href}
               className={`flex flex-col items-center py-3 text-[11px] tracking-wideish uppercase font-semibold ${
-                active ? "text-pink-500" : "text-ink-subtle"
+                active ? "text-warm-purple" : "text-ink-subtle"
               }`}
             >
               <Icon active={!!active} />
@@ -88,7 +88,7 @@ function BottomNav({ pathname }: { pathname: string | null }) {
 }
 
 const ICON_SIZE = 22;
-const stroke = (active: boolean) => (active ? "#E5277B" : "#8E91A8");
+const stroke = (active: boolean) => (active ? "#5E197C" : "#99A7BC");
 
 function LookupIcon({ active }: { active: boolean }) {
   return (
@@ -115,10 +115,16 @@ function AddIcon({ active }: { active: boolean }) {
     </svg>
   );
 }
-function SettingsIcon({ active }: { active: boolean }) {
+function ProfileIcon({ active }: { active: boolean }) {
   return (
     <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M4 7h16M4 12h16M4 17h16" stroke={stroke(active)} strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="12" cy="8.5" r="3.5" stroke={stroke(active)} strokeWidth="1.8" />
+      <path
+        d="M5 19c0-3.5 3.2-6 7-6s7 2.5 7 6"
+        stroke={stroke(active)}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

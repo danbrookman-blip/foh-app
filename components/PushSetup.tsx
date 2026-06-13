@@ -217,7 +217,7 @@ export function PushSetup() {
               onChange={(e) =>
                 updatePrefs({ ...prefs, [code]: e.target.checked })
               }
-              className="h-5 w-5 accent-pink-500"
+              className="h-5 w-5 accent-warm-purple"
             />
           </label>
         ))}

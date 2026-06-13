@@ -98,8 +98,8 @@ export function WaitingClient({ token }: { token: string }) {
     <div className="space-y-4">
       <div className="card p-6 text-center">
         <div className="relative inline-flex h-16 w-16 items-center justify-center mb-3">
-          <span className="absolute inset-0 rounded-full bg-pink-100 animate-ping" />
-          <span className="relative h-3 w-3 rounded-full bg-pink-500" />
+          <span className="absolute inset-0 rounded-full bg-accent-soft animate-ping" />
+          <span className="relative h-3 w-3 rounded-full bg-warm-purple" />
         </div>
         <div className="text-lg font-semibold">Sent — waiting on their tap</div>
         <p className="text-sm text-ink-muted mt-1">

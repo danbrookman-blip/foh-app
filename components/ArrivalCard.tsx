@@ -41,7 +41,7 @@ export function ArrivalCard(props: Props) {
   return (
     <div
       id={hasArrival ? props.customerRef : undefined}
-      className={`card p-4 ${isPriority ? "ring-2 ring-pink-500/40" : ""}`}
+      className={`card p-4 ${isPriority ? "ring-2 ring-warm-purple/40" : ""}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
@@ -67,15 +67,15 @@ export function ArrivalCard(props: Props) {
       </div>
 
       {props.insight ? (
-        <div className="mt-4 rounded-xl2 bg-surface-tint border border-pink-100 px-3 py-2.5 flex gap-2.5 items-start">
-          <span aria-hidden className="text-pink-500 mt-0.5 shrink-0">
+        <div className="mt-4 rounded-xl2 bg-surface-tint border border-accent-soft px-3 py-2.5 flex gap-2.5 items-start">
+          <span aria-hidden className="text-warm-purple mt-0.5 shrink-0">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 2v3M12 19v3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M2 12h3M19 12h3M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12" strokeLinecap="round" />
               <circle cx="12" cy="12" r="3" />
             </svg>
           </span>
           <div className="min-w-0">
-            <div className="section-label text-pink-600">Insight</div>
+            <div className="section-label text-warm-purple">Insight</div>
             <p className="text-sm text-ink leading-snug mt-0.5">{props.insight}</p>
           </div>
         </div>

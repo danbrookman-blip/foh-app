@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,56 +12,59 @@
 html,
 body {
   height: 100%;
-  background: #F8F6FA;
-  color: #0F1543;
+  background: #F1F5F6;
+  color: #202C38;
   -webkit-tap-highlight-color: transparent;
-  font-feature-settings: "ss01", "cv11";
 }
 
 body {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: Lato, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
 @layer components {
   .card {
-    @apply bg-white rounded-xl2 shadow-card border border-navy-100;
+    @apply bg-white rounded-xl2 shadow-card border border-platinum;
   }
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl2 font-semibold tracking-tightish transition-[transform,background,box-shadow] active:scale-[0.99];
+    @apply inline-flex items-center justify-center gap-2 rounded-xl2 font-bold tracking-tightish transition-[transform,background,box-shadow] active:scale-[0.99];
     min-height: 52px;
   }
   .btn-primary {
-    @apply btn bg-pink-500 text-white px-5 shadow-pop hover:bg-pink-600;
+    @apply btn bg-warm-purple text-white px-5 shadow-pop hover:bg-dark-purple;
   }
   .btn-accent {
-    @apply btn bg-navy-800 text-white px-5 hover:bg-navy-900;
+    @apply btn bg-pickled-bluewood text-white px-5 hover:bg-navy-800;
   }
   .btn-ghost {
-    @apply btn bg-white text-ink border border-navy-100 px-5 hover:bg-surface-tint;
+    @apply btn bg-white text-ink border border-platinum px-5 hover:bg-light-blue;
   }
   .field {
-    @apply w-full rounded-xl2 border border-navy-100 bg-white px-4 py-4 text-lg outline-none transition focus:border-pink-500 focus:ring-4 focus:ring-pink-500/15;
+    @apply w-full rounded-xl2 border border-platinum bg-white px-4 py-4 text-lg outline-none transition focus:border-warm-purple focus:ring-4;
     min-height: 56px;
   }
+  .field:focus {
+    box-shadow: 0 0 0 4px rgba(94, 25, 124, 0.15);
+  }
   .pill {
-    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold tracking-wideish uppercase;
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold tracking-wideish uppercase;
   }
   .pill-ok { @apply pill bg-ok-soft text-ok; }
   .pill-warn { @apply pill bg-warn-soft text-warn; }
-  .pill-accent { @apply pill bg-accent-soft text-accent; }
-  .pill-mute { @apply pill bg-navy-100 text-navy-600; }
-  .pill-navy { @apply pill bg-navy-800 text-white; }
+  .pill-accent { @apply pill text-warm-purple; background-color: #EDD6F4; }
+  .pill-mute { @apply pill bg-light-blue text-pickled-bluewood; }
+  .pill-navy { @apply pill bg-pickled-bluewood text-white; }
   .section-label {
-    @apply text-[11px] font-semibold uppercase tracking-wideish text-ink-subtle;
+    @apply text-[11px] font-bold uppercase tracking-wideish text-light-gray;
   }
 }
 
 @layer utilities {
   .wordmark {
-    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-    font-weight: 700;
+    font-family: Lato, ui-sans-serif, system-ui, sans-serif;
+    font-weight: 900;
     letter-spacing: -0.018em;
   }
 }

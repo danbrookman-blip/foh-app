@@ -156,6 +156,10 @@ These structural pieces exist as adapter interfaces with in-memory mocks. Each m
 | `lib/tenant-config/` | Per-operator config: signal toggles, verification expiry override, opt-out registry. | F3.4, P3.3, C1 | Replace mock with the operator-config service brand admins write to |
 | `lib/airship/`, `lib/toggle/`, `lib/hgem/`, `lib/kindness/` | Vendor adapters. UI imports only from the index files. | F1.2, F1.4, F2.5 | Implement the interface in a real client file and re-export |
 
+### Real Airship contact lookup (optional)
+
+Drop `AIRSHIP_PAT` and `AIRSHIP_ACCOUNT_ID` into `.env.local` (or Workers env vars for the prod deploy — see `.env.example` for the full list) and lookups that don't match a seeded persona fall through to `GET https://api.airship.co.uk/v1/contacts` against the real Airship public API. Matches return a real Airship contact ref; entitlement queries still come from the mock because voucher-per-contact isn't in the public API surface. See `lib/airship/airship-client.ts` for the implementation and the handover plan's pre-build gotchas G1.1–G1.3 for the partner-API conversations that unblock the rest.
+
 The audit log's hash-chain integrity can be verified at any time via `audit.verifyChain(operatorId)` — production audit + DSAR endpoints sit on top of that.
 
 ## Spec gaps still open

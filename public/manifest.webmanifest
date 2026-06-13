@@ -4,8 +4,8 @@
   "description": "Front-of-house companion to Airship. Look up customer entitlements without exposing PII, verify redemption by text or email, capture notes and acts of kindness on the floor.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0F1543",
-  "theme_color": "#0F1543",
+  "background_color": "#3D0A4D",
+  "theme_color": "#3D0A4D",
   "orientation": "portrait-primary",
   "categories": ["business", "productivity"],
   "icons": [
