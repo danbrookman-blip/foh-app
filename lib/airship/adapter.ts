@@ -28,6 +28,8 @@ export interface AirshipAdapter {
     channel: "sms" | "email",
     body: { subject?: string; text: string },
   ): Promise<{ ok: boolean }>;
+  /** One-sentence Strava-style observational snippet for the profile view. */
+  getInsight(customerRef: string): Promise<string | null>;
   /** Newest first. Empty array if none. */
   getNotes(customerRef: string): Promise<CustomerNote[]>;
   addNote(input: {

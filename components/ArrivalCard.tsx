@@ -13,8 +13,9 @@ type Props = {
   favouriteCategory: string;
   lastItemOrdered: string;
   birthdayThisMonth: boolean;
-  arrivedAt: number;
-  source: string;
+  /** Arrival-event metadata. Omit when rendering outside the arrivals feed. */
+  arrivedAt?: number;
+  source?: string;
   bookingSize?: number | null;
   triggered?: CriterionEvaluation[];
   /** Strava-style observational snippet — one sentence, narrative. */
@@ -27,7 +28,10 @@ type Props = {
  * uses to decide whether to walk over.
  */
 export function ArrivalCard(props: Props) {
-  const minsAgo = Math.max(1, Math.round((Date.now() - props.arrivedAt) / 60000));
+  const hasArrival = typeof props.arrivedAt === "number";
+  const minsAgo = hasArrival
+    ? Math.max(1, Math.round((Date.now() - (props.arrivedAt as number)) / 60000))
+    : null;
   // Drop the duplicates already conveyed by TierPill / birthday flag.
   const extraTriggered = (props.triggered ?? []).filter(
     (t) => t.code !== "vip" && t.code !== "birthday_month" && t.code !== "at_risk",
@@ -36,7 +40,7 @@ export function ArrivalCard(props: Props) {
 
   return (
     <div
-      id={props.customerRef}
+      id={hasArrival ? props.customerRef : undefined}
       className={`card p-4 ${isPriority ? "ring-2 ring-pink-500/40" : ""}`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -53,10 +57,12 @@ export function ArrivalCard(props: Props) {
               </span>
             ))}
           </div>
-          <div className="text-xs text-ink-subtle mt-0.5">
-            Arrived {minsAgo} min ago · {props.source === "wifi" ? "Wi-Fi sign-in" : "Reservation match"}
-            {props.bookingSize ? ` · party of ${props.bookingSize}` : ""}
-          </div>
+          {hasArrival ? (
+            <div className="text-xs text-ink-subtle mt-0.5">
+              Arrived {minsAgo} min ago · {props.source === "wifi" ? "Wi-Fi sign-in" : "Reservation match"}
+              {props.bookingSize ? ` · party of ${props.bookingSize}` : ""}
+            </div>
+          ) : null}
         </div>
       </div>
 

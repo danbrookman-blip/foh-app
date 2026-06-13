@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ManagerShell } from "@/components/ManagerShell";
+import { ArrivalCard } from "@/components/ArrivalCard";
 import { getSession } from "@/lib/session";
 import { airship } from "@/lib/airship";
 import { toggle } from "@/lib/toggle";
@@ -46,9 +47,11 @@ export default async function ResultsPage({
   const identifierKind = sp.kind === "email" ? "email" : "mobile";
   const identifierHash = sp.hash;
 
-  const [vouchers, giftCards] = await Promise.all([
+  const [vouchers, giftCards, signals, insight] = await Promise.all([
     airship.getVouchers(sp.ref),
     toggle.getGiftCards(sp.ref),
+    airship.getSignals(sp.ref),
+    airship.getInsight(sp.ref),
   ]);
 
   if (vouchers.length === 0 && giftCards.length === 0) {
@@ -58,6 +61,22 @@ export default async function ResultsPage({
         title="No entitlements found"
         back="/lookup"
       >
+        {signals ? (
+          <div className="mb-4">
+            <ArrivalCard
+              customerRef={sp.ref}
+              displayName={signals.displayName}
+              tier={signals.tier}
+              lastVisitAt={signals.lastVisitAt}
+              visitsLast90Days={signals.visitsLast90Days}
+              lifetimeVisits={signals.lifetimeVisits}
+              favouriteCategory={signals.favouriteCategory}
+              lastItemOrdered={signals.lastItemOrdered}
+              birthdayThisMonth={signals.birthdayThisMonth}
+              insight={insight ?? undefined}
+            />
+          </div>
+        ) : null}
         <div className="card p-5">
           <div className="text-lg font-semibold">No entitlements found</div>
           <p className="text-ink-muted text-sm mt-1">
@@ -75,6 +94,22 @@ export default async function ResultsPage({
       title="What they can redeem"
       back="/lookup"
     >
+      {signals ? (
+        <div className="mb-4">
+          <ArrivalCard
+            customerRef={sp.ref}
+            displayName={signals.displayName}
+            tier={signals.tier}
+            lastVisitAt={signals.lastVisitAt}
+            visitsLast90Days={signals.visitsLast90Days}
+            lifetimeVisits={signals.lifetimeVisits}
+            favouriteCategory={signals.favouriteCategory}
+            lastItemOrdered={signals.lastItemOrdered}
+            birthdayThisMonth={signals.birthdayThisMonth}
+            insight={insight ?? undefined}
+          />
+        </div>
+      ) : null}
       <ResultsClient
         customerRef={sp.ref}
         identifierKind={identifierKind}

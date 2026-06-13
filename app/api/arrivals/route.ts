@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { airship } from "@/lib/airship";
-import { SEED_CUSTOMERS } from "@/lib/seeds";
 import { DEFAULT_CRITERIA, evaluateArrival } from "@/lib/arrival-criteria";
 
 /**
@@ -24,10 +23,12 @@ export async function GET() {
 
   const arrivals = await Promise.all(
     order.map(async (ref, i) => {
-      const signals = await airship.getSignals(ref);
-      const seed = SEED_CUSTOMERS.find((c) => c.ref === ref);
-      if (!signals || !seed) return null;
-      const vouchers = await airship.getVouchers(ref);
+      const [signals, vouchers, insight] = await Promise.all([
+        airship.getSignals(ref),
+        airship.getVouchers(ref),
+        airship.getInsight(ref),
+      ]);
+      if (!signals) return null;
       const bookingSize = bookingSizes[ref] ?? null;
       const triggered = evaluateArrival({
         signals,
@@ -41,7 +42,7 @@ export async function GET() {
         source: i % 2 === 0 ? "wifi" : "booking",
         bookingSize,
         triggered,
-        insight: seed.insight,
+        insight: insight ?? undefined,
       };
     }),
   );

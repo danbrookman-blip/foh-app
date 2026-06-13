@@ -193,6 +193,11 @@ export const airshipMock: AirshipAdapter = {
     return { ok: true };
   },
 
+  async getInsight(customerRef) {
+    const seed = findSeedByRef(customerRef);
+    return seed?.insight ?? null;
+  },
+
   async getNotes(customerRef) {
     return NOTES.filter((n) => n.customerRef === customerRef).sort(
       (a, b) => b.createdAt - a.createdAt,
