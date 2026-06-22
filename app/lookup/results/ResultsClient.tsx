@@ -56,13 +56,6 @@ export function ResultsClient({
 
   return (
     <div className="space-y-5">
-      <div className="card p-4 bg-surface-tint border-accent-soft">
-        <div className="section-label">What the manager sees</div>
-        <div className="text-sm text-ink-muted mt-1">
-          No name, no number, no email. Just what they can redeem on this visit.
-        </div>
-      </div>
-
       {vouchers.length > 0 ? (
         <section>
           <h2 className="section-label mb-2">Vouchers · Airship</h2>
