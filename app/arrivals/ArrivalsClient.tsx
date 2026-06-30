@@ -15,6 +15,8 @@ type Arrival = {
   lastItemOrdered: string;
   birthdayThisMonth: boolean;
   arrivedAt: number;
+  at: number;
+  kind: "arrived" | "booking";
   source: string;
   bookingSize: number | null;
   triggered: CriterionEvaluation[];
@@ -22,7 +24,6 @@ type Arrival = {
 
 export function ArrivalsClient() {
   const [arrivals, setArrivals] = useState<Arrival[] | null>(null);
-  const [demoOpen, setDemoOpen] = useState(false);
   const [demoBusy, setDemoBusy] = useState<string | null>(null);
   const [demoResult, setDemoResult] = useState<string | null>(null);
 
@@ -69,13 +70,23 @@ export function ArrivalsClient() {
     );
   };
 
+  if (arrivals === null) {
+    return <div className="text-ink-muted text-sm">Loading…</div>;
+  }
+  if (arrivals.length === 0) {
+    return (
+      <div className="card p-5 text-sm text-ink-muted">
+        No known customers in yet. They'll appear here as they connect to Wi-Fi or check in.
+      </div>
+    );
+  }
+
+  const here = arrivals.filter((a) => a.kind === "arrived");
+  const later = arrivals.filter((a) => a.kind === "booking");
+
   return (
-    <div className="space-y-4">
-      <details
-        className="card p-4"
-        open={demoOpen}
-        onToggle={(e) => setDemoOpen((e.target as HTMLDetailsElement).open)}
-      >
+    <div className="space-y-5">
+      <details className="card p-4">
         <summary className="text-sm font-semibold cursor-pointer">
           Demo controls — simulate an arrival
         </summary>
@@ -84,7 +95,7 @@ export function ArrivalsClient() {
           Here you can trigger one manually to see the criteria evaluate and the push fire.
         </p>
         <div className="mt-3 grid grid-cols-1 gap-2">
-          {(arrivals ?? []).map((a) => (
+          {arrivals.map((a) => (
             <button
               key={a.customerRef}
               type="button"
@@ -113,25 +124,37 @@ export function ArrivalsClient() {
         ) : null}
       </details>
 
-      {arrivals === null ? (
-        <div className="text-ink-muted text-sm">Loading…</div>
-      ) : arrivals.length === 0 ? (
-        <div className="card p-5 text-sm text-ink-muted">
-          No known customers in yet. They'll appear here as they connect to Wi-Fi or check in.
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {arrivals.map((a) => (
-            // Key on customerRef alone — arrivedAt is recomputed on every poll,
-            // so including it forces every card to remount every 8s, blowing away
-            // notes/kindness/voice state.
-            <ArrivalCard key={a.customerRef} {...a} />
-          ))}
-          <p className="text-xs text-ink-subtle text-center mt-4">
-            Refreshes every few seconds · No personal data shown beyond first name + initial.
-          </p>
-        </div>
-      )}
+      {here.length > 0 ? (
+        <section className="space-y-2">
+          <div className="flex items-baseline justify-between px-1">
+            <h2 className="section-label">Here now</h2>
+            <span className="text-xs text-ink-subtle">{here.length}</span>
+          </div>
+          <div className="space-y-2">
+            {here.map((a) => (
+              <ArrivalCard key={a.customerRef} {...a} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {later.length > 0 ? (
+        <section className="space-y-2">
+          <div className="flex items-baseline justify-between px-1">
+            <h2 className="section-label">Coming later today</h2>
+            <span className="text-xs text-ink-subtle">{later.length}</span>
+          </div>
+          <div className="space-y-2">
+            {later.map((a) => (
+              <ArrivalCard key={a.customerRef} {...a} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <p className="text-xs text-ink-subtle text-center mt-4">
+        Tap a row for the full profile · Refreshes every few seconds
+      </p>
     </div>
   );
 }
