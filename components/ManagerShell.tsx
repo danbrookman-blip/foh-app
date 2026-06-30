@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Wordmark } from "./Wordmark";
+import { Sidebar } from "./Sidebar";
 
 type ShellProps = {
   children: React.ReactNode;
@@ -11,14 +13,37 @@ type ShellProps = {
   back?: string;
 };
 
+/**
+ * Responsive shell:
+ *  - Mobile (<md): header on top, content full-width within max-w-md, BottomNav fixed at the foot.
+ *  - Desktop (md+): collapsible Sidebar on the left, main column offset by sidebar width, no BottomNav.
+ *
+ * The Sidebar's collapsed state lives here so the main column can react with the
+ * right left margin (16 / 60 width tiers). No persistence across pages — kept
+ * deliberately session-light.
+ */
 export function ManagerShell({ children, manager, title, back }: ShellProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [navCollapsed, setNavCollapsed] = useState(false);
+
   return (
-    <>
-      <header className="sticky top-0 z-10 bg-white/85 backdrop-blur border-b border-navy-100/60">
-        <div className="px-4 pt-4 pb-3">
-          <div className="flex items-center gap-3">
+    <div className="min-h-screen">
+      {manager ? (
+        <Sidebar
+          collapsed={navCollapsed}
+          onToggle={() => setNavCollapsed((v) => !v)}
+          manager={manager}
+        />
+      ) : null}
+
+      <div
+        className={`min-h-screen flex flex-col transition-[margin] duration-200 ${
+          manager ? (navCollapsed ? "md:ml-16" : "md:ml-60") : ""
+        }`}
+      >
+        <header className="sticky top-0 z-10 bg-white/85 backdrop-blur border-b border-platinum">
+          <div className="mx-auto max-w-md md:max-w-none px-4 md:px-8 pt-4 pb-3 flex items-center gap-3">
             {back ? (
               <button
                 onClick={() => router.push(back)}
@@ -28,26 +53,32 @@ export function ManagerShell({ children, manager, title, back }: ShellProps) {
                 ←
               </button>
             ) : (
-              <Wordmark />
+              <div className="md:hidden">
+                <Wordmark />
+              </div>
             )}
             <div className="flex-1 min-w-0">
               {title ? (
-                <div className="text-lg font-semibold leading-tight truncate text-navy-900">
+                <div className="text-lg md:text-xl font-bold leading-tight truncate text-pickled-bluewood">
                   {title}
                 </div>
               ) : null}
               {manager ? (
-                <div className="text-xs text-ink-muted truncate">
+                <div className="text-xs text-ink-muted truncate md:hidden">
                   {manager.venue} · {manager.name}
                 </div>
               ) : null}
             </div>
           </div>
-        </div>
-      </header>
-      <main className="flex-1 px-4 py-4 pb-28">{children}</main>
-      {manager ? <BottomNav pathname={pathname} /> : null}
-    </>
+        </header>
+
+        <main className="flex-1 px-4 md:px-8 py-4 md:py-6 pb-28 md:pb-10">
+          <div className="mx-auto max-w-md md:max-w-7xl">{children}</div>
+        </main>
+
+        {manager ? <BottomNav pathname={pathname} /> : null}
+      </div>
+    </div>
   );
 }
 
@@ -60,7 +91,7 @@ function BottomNav({ pathname }: { pathname: string | null }) {
   ];
   return (
     <nav
-      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/90 backdrop-blur border-t border-navy-100/60"
+      className="md:hidden fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white/90 backdrop-blur border-t border-platinum"
       style={{ paddingBottom: "var(--safe-bottom)" }}
     >
       <div className="grid grid-cols-4">
@@ -119,12 +150,7 @@ function ProfileIcon({ active }: { active: boolean }) {
   return (
     <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" aria-hidden>
       <circle cx="12" cy="8.5" r="3.5" stroke={stroke(active)} strokeWidth="1.8" />
-      <path
-        d="M5 19c0-3.5 3.2-6 7-6s7 2.5 7 6"
-        stroke={stroke(active)}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
+      <path d="M5 19c0-3.5 3.2-6 7-6s7 2.5 7 6" stroke={stroke(active)} strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }

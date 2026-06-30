@@ -28,10 +28,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased">
-        <div className="mx-auto max-w-md min-h-screen flex flex-col bg-surface-alt">
-          {children}
-        </div>
+      <body className="min-h-screen antialiased bg-surface-alt">
+        {children}
         <script
           dangerouslySetInnerHTML={{
             __html: `if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); }); }`,

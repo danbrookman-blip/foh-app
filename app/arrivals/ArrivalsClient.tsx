@@ -83,9 +83,22 @@ export function ArrivalsClient() {
 
   const here = arrivals.filter((a) => a.kind === "arrived");
   const later = arrivals.filter((a) => a.kind === "booking");
+  const priorityCount = arrivals.filter((a) =>
+    a.triggered.some((t) => t.priority >= 80),
+  ).length;
 
   return (
     <div className="space-y-5">
+      <section className="hidden md:grid grid-cols-3 gap-4">
+        <Stat number={here.length} label="Here now" />
+        <Stat number={later.length} label="Coming later today" />
+        <Stat
+          number={priorityCount}
+          label={priorityCount === 1 ? "Priority signal" : "Priority signals"}
+          accent
+        />
+      </section>
+
       <details className="card p-4">
         <summary className="text-sm font-semibold cursor-pointer">
           Demo controls — simulate an arrival
@@ -128,9 +141,9 @@ export function ArrivalsClient() {
         <section className="space-y-2">
           <div className="flex items-baseline justify-between px-1">
             <h2 className="section-label">Here now</h2>
-            <span className="text-xs text-ink-subtle">{here.length}</span>
+            <span className="text-xs text-ink-subtle md:hidden">{here.length}</span>
           </div>
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
             {here.map((a) => (
               <ArrivalCard key={a.customerRef} {...a} />
             ))}
@@ -142,9 +155,9 @@ export function ArrivalsClient() {
         <section className="space-y-2">
           <div className="flex items-baseline justify-between px-1">
             <h2 className="section-label">Coming later today</h2>
-            <span className="text-xs text-ink-subtle">{later.length}</span>
+            <span className="text-xs text-ink-subtle md:hidden">{later.length}</span>
           </div>
-          <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
             {later.map((a) => (
               <ArrivalCard key={a.customerRef} {...a} />
             ))}
@@ -155,6 +168,25 @@ export function ArrivalsClient() {
       <p className="text-xs text-ink-subtle text-center mt-4">
         Tap a row for the full profile · Refreshes every few seconds
       </p>
+    </div>
+  );
+}
+
+function Stat({
+  number,
+  label,
+  accent = false,
+}: {
+  number: number;
+  label: string;
+  accent?: boolean;
+}) {
+  return (
+    <div className={`card p-5 ${accent ? "bg-deep-purple text-white border-deep-purple" : ""}`}>
+      <div className={`text-4xl font-black tabular-nums leading-none ${accent ? "text-neon-magenta" : "text-pickled-bluewood"}`}>
+        {number}
+      </div>
+      <div className={`mt-2 section-label ${accent ? "text-white/70" : ""}`}>{label}</div>
     </div>
   );
 }
