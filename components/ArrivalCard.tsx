@@ -16,6 +16,7 @@ type Props = {
   favouriteCategory: string;
   lastItemOrdered: string;
   birthdayThisMonth: boolean;
+  anniversaryThisMonth?: boolean;
   /** Arrival-event metadata. Omit when rendering outside the arrivals feed. */
   arrivedAt?: number;
   source?: string;
@@ -38,7 +39,11 @@ export function ArrivalCard(props: Props) {
   const [expanded, setExpanded] = useState(false);
 
   const extraTriggered = (props.triggered ?? []).filter(
-    (t) => t.code !== "vip" && t.code !== "birthday_month" && t.code !== "at_risk",
+    (t) =>
+      t.code !== "vip" &&
+      t.code !== "birthday_month" &&
+      t.code !== "anniversary" &&
+      t.code !== "at_risk",
   );
   const isPriority = (props.triggered ?? []).some((t) => t.priority >= 80);
   const kind = props.kind ?? (props.arrivedAt ? "arrived" : undefined);
@@ -59,7 +64,10 @@ export function ArrivalCard(props: Props) {
             <span className="text-base font-bold text-ink">{props.displayName}</span>
             <TierPill tier={props.tier} />
             {props.birthdayThisMonth ? (
-              <span className="pill-accent">🎂</span>
+              <span className="pill-accent" title="Birthday this month">🎂</span>
+            ) : null}
+            {props.anniversaryThisMonth ? (
+              <span className="pill-accent" title="Anniversary this month">🥂</span>
             ) : null}
             {extraTriggered.map((t) => (
               <span key={t.code} className="pill-warn">

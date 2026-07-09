@@ -8,6 +8,7 @@ type Permission = "default" | "granted" | "denied" | "unsupported";
 const CRITERION_LABELS: Record<CriterionCode, string> = {
   vip: "VIP arrives",
   birthday_month: "Birthday this month",
+  anniversary: "Anniversary this month",
   lapsed_returning: "Lapsed regular returning",
   at_risk: "At-risk / recovery",
   voucher_expiring: "Voucher about to expire",

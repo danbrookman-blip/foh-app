@@ -14,6 +14,7 @@
 export type CriterionCode =
   | "vip"
   | "birthday_month"
+  | "anniversary"
   | "lapsed_returning"
   | "at_risk"
   | "voucher_expiring"
@@ -48,6 +49,7 @@ export type CriterionEvaluation = {
 export const DEFAULT_CRITERIA: CriteriaConfig = {
   vip: { enabled: true },
   birthday_month: { enabled: true },
+  anniversary: { enabled: true },
   lapsed_returning: { enabled: true, lapsedDays: 60 },
   at_risk: { enabled: true },
   voucher_expiring: { enabled: true, voucherExpiryDays: 14 },

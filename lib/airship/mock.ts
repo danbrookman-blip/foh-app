@@ -146,6 +146,7 @@ export const airshipMock: AirshipAdapter = {
       favouriteCategory: seed.favouriteCategory,
       lastItemOrdered: seed.lastItemOrdered,
       birthdayThisMonth: seed.birthMonth === currentMonth,
+      anniversaryThisMonth: seed.anniversaryMonth === currentMonth,
     };
     return signals;
   },

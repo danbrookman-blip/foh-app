@@ -31,6 +31,8 @@ export type SeedCustomer = {
   favouriteCategory: string;
   lastItemOrdered: string;
   birthMonth: number;
+  /** Month (1-12) of a wedding/relationship or membership anniversary, if known. */
+  anniversaryMonth?: number;
   consentMarketing: boolean;
   /**
    * Strava-style observational snippet — a single sentence the floor server can
@@ -130,6 +132,7 @@ export const SEED_CUSTOMERS: SeedCustomer[] = [
     favouriteCategory: "Wine",
     lastItemOrdered: "Picpoul de Pinet",
     birthMonth: ((currentMonth + 2) % 12) + 1,
+    anniversaryMonth: currentMonth,
     consentMarketing: false,
     insight:
       "Wine list expert — Picpoul is the usual. Enjoys talking through the list; let her pick if she's undecided. Quiet table, please.",
@@ -148,6 +151,7 @@ export const SEED_CUSTOMERS: SeedCustomer[] = [
     favouriteCategory: "Wine",
     lastItemOrdered: "Sancerre",
     birthMonth: ((currentMonth + 3) % 12) + 1,
+    anniversaryMonth: currentMonth,
     consentMarketing: true,
     insight:
       "Books the window two-top most Fridays after work. A glass of Sancerre to start, then whatever the fish special is.",

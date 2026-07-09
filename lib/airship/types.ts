@@ -41,6 +41,8 @@ export type CustomerSignals = {
   favouriteCategory: string;
   lastItemOrdered: string;
   birthdayThisMonth: boolean;
+  /** A milestone worth marking this month — wedding/relationship or membership anniversary. */
+  anniversaryThisMonth?: boolean;
 };
 
 export type RegisterCustomerInput = {

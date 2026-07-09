@@ -44,6 +44,15 @@ export function evaluateArrival(input: {
     });
   }
 
+  if (config.anniversary.enabled && signals.anniversaryThisMonth) {
+    out.push({
+      code: "anniversary",
+      label: "Anniversary",
+      headline: "Anniversary this month",
+      priority: 83,
+    });
+  }
+
   if (config.at_risk.enabled && (signals.tier === "at-risk" || signals.tier === "recovery")) {
     out.push({
       code: "at_risk",
