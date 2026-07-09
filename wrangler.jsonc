@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "foh-app",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  }
+  // Environment variables for the live demo (VAPID keys, AIRSHIP_PAT, etc.)
+  // are set in the Cloudflare dashboard, NOT here — see README "Known
+  // limitations on the deployed URL". Secrets: `wrangler secret put NAME`.
+}

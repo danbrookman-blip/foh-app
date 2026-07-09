@@ -5,3 +5,8 @@ out
 .env*.local
 .DS_Store
 .claude/
+
+# OpenNext / Cloudflare Workers build output
+.open-next
+.wrangler
+cloudflare-env.d.ts

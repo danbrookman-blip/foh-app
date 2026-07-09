@@ -138,6 +138,19 @@ Important finding from the docs: **HGEM's public Results API is read-only.** Kle
 
 Swap point is the same as the others: `lib/hgem/index.ts`.
 
+## Deploying
+
+The app ships to Cloudflare Workers through the [OpenNext](https://opennext.js.org/cloudflare) adapter. Config lives in [`wrangler.jsonc`](wrangler.jsonc) (worker name `foh-app`) and [`open-next.config.ts`](open-next.config.ts).
+
+**Deploys run in CI, not locally.** The adapter and Wrangler both depend on `workerd`, which has no `win32-arm64` build, so the deploy cannot run on the ARM64 dev machine. [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds and deploys on a Linux runner on every push to `main` (and via manual "Run workflow"). One-time setup — add two repository secrets under **Settings → Secrets and variables → Actions**:
+
+- `CLOUDFLARE_API_TOKEN` — a token with the *Edit Cloudflare Workers* template scope
+- `CLOUDFLARE_ACCOUNT_ID` — your account ID (Cloudflare dashboard → Workers & Pages → right sidebar)
+
+Runtime env vars (VAPID keys, `AIRSHIP_PAT`, …) are **not** deployed from the repo — set them in the Cloudflare dashboard as described below.
+
+On any Linux/x64 machine you can also deploy by hand with `npm run deploy` (or preview a production build locally with `npm run preview`). Both invoke the OpenNext CLI, so both need `workerd` — hence CI for the ARM64 box. Local `npm install` on ARM64 needs `--ignore-scripts` to skip `workerd`'s binary download (it isn't needed for `next dev`).
+
 ## Known limitations on the deployed URL
 
 The Cloudflare Workers deployment serves the spine and all seeded content correctly. Two things to know before using it as a working demo across multiple devices:
