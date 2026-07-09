@@ -143,7 +143,7 @@ export function ArrivalsClient() {
             <h2 className="section-label">Here now</h2>
             <span className="text-xs text-ink-subtle md:hidden">{here.length}</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 items-start">
             {here.map((a) => (
               <ArrivalCard key={a.customerRef} {...a} />
             ))}
@@ -157,7 +157,7 @@ export function ArrivalsClient() {
             <h2 className="section-label">Coming later today</h2>
             <span className="text-xs text-ink-subtle md:hidden">{later.length}</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 items-start">
             {later.map((a) => (
               <ArrivalCard key={a.customerRef} {...a} />
             ))}

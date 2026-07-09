@@ -24,9 +24,14 @@ type FeedItem = {
   bookingSize: number | null;
 };
 
-function tonight(hours: number, minutes = 0): number {
-  const d = new Date();
-  d.setHours(hours, minutes, 0, 0);
+/**
+ * A booking slot `minutesFromNow` ahead, rounded down to the nearest quarter
+ * hour so it reads like a real reservation time (19:30, not 19:37). Computing
+ * from "now" keeps every booking genuinely forthcoming whenever the demo runs.
+ */
+function slot(minutesFromNow: number): number {
+  const d = new Date(Date.now() + minutesFromNow * 60_000);
+  d.setMinutes(d.getMinutes() - (d.getMinutes() % 15), 0, 0);
   return d.getTime();
 }
 
@@ -39,9 +44,15 @@ export async function GET() {
     { ref: "c_sarah", kind: "arrived", at: now - 4 * MIN, source: "wifi", bookingSize: null },
     { ref: "c_priya", kind: "arrived", at: now - 18 * MIN, source: "booking", bookingSize: 2 },
     { ref: "c_ben", kind: "arrived", at: now - 32 * MIN, source: "wifi", bookingSize: null },
-    // Coming later today
-    { ref: "c_olivia", kind: "booking", at: tonight(19, 30), source: "booking", bookingSize: 4 },
-    { ref: "c_james", kind: "booking", at: tonight(20, 15), source: "booking", bookingSize: 9 },
+    // Coming later today — confirmed reservations across the evening
+    { ref: "c_grace", kind: "booking", at: slot(40), source: "booking", bookingSize: 2 },
+    { ref: "c_olivia", kind: "booking", at: slot(75), source: "booking", bookingSize: 4 },
+    { ref: "c_dev", kind: "booking", at: slot(110), source: "booking", bookingSize: 2 },
+    { ref: "c_amara", kind: "booking", at: slot(145), source: "booking", bookingSize: 3 },
+    { ref: "c_holly", kind: "booking", at: slot(180), source: "booking", bookingSize: 4 },
+    { ref: "c_james", kind: "booking", at: slot(215), source: "booking", bookingSize: 9 },
+    { ref: "c_marco", kind: "booking", at: slot(250), source: "booking", bookingSize: 6 },
+    { ref: "c_theo", kind: "booking", at: slot(300), source: "booking", bookingSize: 8 },
   ];
 
   // Anything booked in the past (i.e. their booking has already started but they
